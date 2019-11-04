@@ -1,0 +1,31 @@
+server:
+    port: 8088
+
+application:
+    topicName: '/topic/messages/'
+    cmdproperties:
+        ignoreUnknownCmd: true
+        unknownCmdMessageTemplate: 'Неизвестная команда!'
+        syncReplyMapping:
+            cmd1: 'Sync reply on cmd1'
+            cmd2: 'Sync reply on cmd2'
+        asyncCmdProperties:
+            globalTimeoutMs: 3000
+            globalTimeoutErrorMessage: "Таймаут операции"
+            replyMapping:
+                cmd3:
+                    replyMessage: "Команда cmd3 исполнена на клиенте"
+                    beforeActionReplyMessage: "Команда cmd3 принята в обработку"
+                    timeoutMs: 15000
+                    timeoutErrorMessage: "Таймаут для cmd3!"
+                cmd4:
+                    replyMessage: "Команда cmd4 исполнена на клиенте"
+                    beforeActionReplyMessage: "Команда cmd4 принята в обработку"
+                    timeoutMs: 20000
+                    timeoutErrorMessage: "Таймаут для cmd4!"
+                cmd5:
+                    replyMessage: "Команда cmd5 исполнена на клиенте"
+    botproperties:
+        connectionTimeoutMs: 3000
+        name: 'bot-name'
+        token: 'api-token'
