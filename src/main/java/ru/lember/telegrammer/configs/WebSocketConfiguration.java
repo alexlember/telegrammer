@@ -23,9 +23,12 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry
                                                registry) {
-        //registry.addEndpoint("/chat"); todo is it necessary?
-        registry.addEndpoint("/cmd")
-                .setAllowedOrigins("/*").withSockJS(); // todo which origins?
+       // registry.addEndpoint("/cmd"); //todo is it necessary?
+//        registry.addEndpoint("/websocket")
+//                .setAllowedOrigins("*").withSockJS(); // todo which origins?
+        registry.addEndpoint("/chat");
+        registry.addEndpoint("/chat")
+                .setAllowedOrigins("/*").withSockJS();
     }
 
     @Override
