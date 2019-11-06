@@ -21,24 +21,18 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     }
 
     @Override
-    public void registerStompEndpoints(StompEndpointRegistry
-                                               registry) {
-       // registry.addEndpoint("/cmd"); //todo is it necessary?
-//        registry.addEndpoint("/websocket")
-//                .setAllowedOrigins("*").withSockJS(); // todo which origins?
-        registry.addEndpoint("/chat");
-        registry.addEndpoint("/chat")
-                .setAllowedOrigins("/*").withSockJS();
+    public void registerStompEndpoints(StompEndpointRegistry registry) {
 
-        registry.addEndpoint("/test");
-        registry.addEndpoint("/test")
-                .setAllowedOrigins("/*").withSockJS();
+        registry.addEndpoint("/websocket");
+//        registry.addEndpoint("/websocket")
+//                .setAllowedOrigins("/*").withSockJS(); // todo not needed actually
+
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config){
-        config.enableSimpleBroker("/topic/", "/queue/");
-        config.setApplicationDestinationPrefixes("/app");
+        config.enableSimpleBroker("/topic/"); // todo could be "/topic/", "/queue/"
+        //config.setApplicationDestinationPrefixes("/app"); // todo not needed actually (on client session.send("/app/...)
     }
 
 }

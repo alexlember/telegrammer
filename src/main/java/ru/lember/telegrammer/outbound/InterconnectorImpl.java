@@ -12,18 +12,16 @@ public class InterconnectorImpl implements Interconnector {
     @Getter
     private ReplayProcessor<Response> processor = ReplayProcessor.create();
 
-    private String topicName;
     private SimpMessagingTemplate simpMessagingTemplate;
 
     @Autowired
-    public InterconnectorImpl(String topicName, SimpMessagingTemplate simpMessagingTemplate) {
-        this.topicName = topicName;
+    public InterconnectorImpl(SimpMessagingTemplate simpMessagingTemplate) {
         this.simpMessagingTemplate = simpMessagingTemplate;
     }
 
     @Override
     public void sendRequest(Request request) {
-        log.info("Sending request: {} to clients to topic: {}", request, topicName);
+        log.info("Sending request: {} to /topic/messages", request);
         simpMessagingTemplate.convertAndSend("/topic/messages", request);
     }
 

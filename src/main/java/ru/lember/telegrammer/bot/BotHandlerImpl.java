@@ -137,7 +137,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
                         tryExecute(replyMessage);
 
                     }, t -> {
-                        log.error("Error during executing request cmd: {} with id: {}. Error: ", cmd, id, t);
+                        log.error("Error during executing request cmd: {} with id: {}. Error: {}", cmd, id, t.getMessage());
 
                         if (t instanceof TimeoutException) {
 

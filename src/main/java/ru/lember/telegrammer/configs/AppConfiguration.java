@@ -65,7 +65,7 @@ public class AppConfiguration {
 
     @Bean
     Interconnector interconnector() {
-        return new InterconnectorImpl(properties.getTopicName(), messagingTemplate);
+        return new InterconnectorImpl(messagingTemplate);
     }
 
 }

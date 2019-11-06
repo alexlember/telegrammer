@@ -2,12 +2,9 @@ package ru.lember.telegrammer.outbound;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.messaging.Message;
 import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.annotation.SendToUser;
 import org.springframework.stereotype.Controller;
 
 import javax.annotation.PostConstruct;
@@ -28,34 +25,19 @@ public class WebSocketController {
         this.interconnector = interconnector;
     }
 
-//    @MessageMapping("/news")
-//    @SendTo("/topic/news")
-//    public void send(@Payload Response response) {
-//        log.info("Response received: {}", response);
-//        interconnector.onResponse(response);
-//    }
-
     @MessageMapping("/topic/messages/reply")
-    //@MessageMapping("/chat")
-    //@SendTo("/topic/messages")
-    public void send(@Payload Response message) {
-        log.info("Response Message: {}", message);
-        interconnector.onResponse(message);
-        //return message;
+    public void send(@Payload Response response) {
+        log.info("/topic/messages/reply response: {}", response);
+        interconnector.onResponse(response);
     }
 
+    /**
+     * todo not sure if it's actually working
+     */
     @MessageExceptionHandler
-    @SendToUser("/queue/errors")
-    public String handleException(Throwable exception) {
-        return exception.getMessage();
+    public void handleException(Throwable exception) {
+        log.error("WebSocketController error: ", exception);
     }
 
-//    @MessageMapping("/test")
-//    @SendTo("/topic/messages")
-//    public void test(@Payload Response message) {
-//        log.info("Response Message: {}", message);
-//        interconnector.onResponse(message);
-//        //return message;
-//    }
 
 }
