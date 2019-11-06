@@ -24,7 +24,7 @@ public class InterconnectorImpl implements Interconnector {
     @Override
     public void sendRequest(Request request) {
         log.info("Sending request: {} to clients to topic: {}", request, topicName);
-        simpMessagingTemplate.convertAndSend(topicName, request);
+        simpMessagingTemplate.convertAndSend("/topic/messages", request);
     }
 
     @Override

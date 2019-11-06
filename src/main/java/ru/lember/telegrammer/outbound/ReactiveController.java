@@ -18,7 +18,7 @@ public class ReactiveController {
         return Mono.just("yes, available");
     }
 
-    @PostMapping("/cmd")
+    @PostMapping("/command")
     public Mono<String> cmd(@RequestBody ChatUpdate update) {
 
         if (botHandler instanceof BotHandler) {
