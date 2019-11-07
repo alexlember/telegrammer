@@ -54,7 +54,7 @@ public class AppConfiguration {
 
         botOptions.setRequestConfig(config);
 
-        return new BotHandlerImpl(botOptions, properties.getBotProperties(), analyzer, interconnector);
+        return new BotHandlerImpl(botOptions, properties.getBotProperties(), analyzer, interconnector, properties.getUserProperties());
     }
 
     @Bean

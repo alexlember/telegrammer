@@ -2,7 +2,10 @@ server:
     port: 8088
 
 application:
-    topicName: '/topic/messages/'
+    userproperties:
+        allowedUsers:
+            - '224823566'
+        replyForUnknownUser: 'Мне запрещено разговаривать с незнакомцами'
     cmdproperties:
         ignoreUnknownCmd: true
         unknownCmdMessageTemplate: 'Неизвестная команда!'

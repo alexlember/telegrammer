@@ -12,5 +12,5 @@ public class ChatUpdate {
     private String cmd;
     private Long chatId;
     private Integer messageId;
-    private String user;
+    private Integer userId;
 }

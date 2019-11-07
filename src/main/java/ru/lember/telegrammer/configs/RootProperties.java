@@ -28,6 +28,7 @@ public class RootProperties {
 
     private CmdProperties cmdProperties;
     private BotProperties botProperties;
+    private UserProperties userProperties;
 
-    private String topicName;
+
 }
