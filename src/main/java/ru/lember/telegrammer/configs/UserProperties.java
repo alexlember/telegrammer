@@ -22,4 +22,9 @@ public class UserProperties {
     private List<String> allowedUsers;
     private String replyForUnknownUser;
 
+    /**
+     * Список id чатов, которые получат входящие запросы от RPI.
+     */
+    private List<String> incomingRequestChatIdReceiver;
+
 }

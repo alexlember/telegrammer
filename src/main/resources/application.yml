@@ -6,6 +6,9 @@ application:
         allowedUsers:
             - '224823566'
         replyForUnknownUser: 'Мне запрещено разговаривать с незнакомцами'
+        incomingRequestChatIdReceiver:
+            - '32234234'
+            - '32232112'
     cmdproperties:
         ignoreUnknownCmd: true
         unknownCmdMessageTemplate: 'Неизвестная команда!'

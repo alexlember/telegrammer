@@ -6,6 +6,8 @@ import org.springframework.messaging.handler.annotation.MessageExceptionHandler;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Controller;
+import ru.lember.telegrammer.dto.in.ResponseToRemote;
+import ru.lember.telegrammer.dto.out.RequestFromRpi;
 
 import javax.annotation.PostConstruct;
 
@@ -26,9 +28,15 @@ public class WebSocketController {
     }
 
     @MessageMapping("/topic/messages/reply")
-    public void send(@Payload Response response) {
-        log.info("/topic/messages/reply response: {}", response);
-        interconnector.onResponse(response);
+    public void receiveResponse(@Payload ResponseToRemote response) {
+        log.info("/topic/messages/reply dto: {}", response);
+        interconnector.onRpiUpdateEvent(response);
+    }
+
+    @MessageMapping("/topic/requests")
+    public void receiveRequest(@Payload RequestFromRpi requestFromRpi) {
+        log.info("/topic/requests dto: {}", requestFromRpi);
+        interconnector.onRpiUpdateEvent(requestFromRpi);
     }
 
     /**
