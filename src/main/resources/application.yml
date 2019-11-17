@@ -33,5 +33,5 @@ application:
                     replyMessage: "Команда cmd5 исполнена на клиенте"
     botproperties:
         connectionTimeoutMs: 3000
-        name: 'bot-name'
-        token: 'api-token'
+        name: 'AlexeyLemberskiy_bot'
+        token: '977798690:AAHMv3t-kfQhxM16MpEvdCa39e5NAQgsZB4'
