@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import ru.lember.telegrammer.configs.reply.ReplyDto;
 
 import javax.annotation.PostConstruct;
 import java.util.List;
@@ -20,7 +21,7 @@ public class UserProperties {
     }
 
     private List<String> allowedUsers;
-    private String replyForUnknownUser;
+    private ReplyDto replyForUnknownUser;
 
     /**
      * Список id чатов, которые получат входящие запросы от RPI.

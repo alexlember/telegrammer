@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
+import ru.lember.telegrammer.configs.reply.ReplyDto;
 
 import javax.annotation.PostConstruct;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.Map;
 @Slf4j
 @Data
 @Component
-@ConfigurationProperties("cmdproperties")
+@ConfigurationProperties
 public class CmdProperties {
 
     @PostConstruct
@@ -21,8 +22,8 @@ public class CmdProperties {
     }
 
     private boolean ignoreUnknownCmd = true;
-    private String unknownCmdMessageTemplate = "The command %s is unknown";
-    private @Nullable Map<String, String> syncReplyMapping;
+    private ReplyDto unknownCmdMessageTemplate = ReplyDto.ofText("The command %s is unknown");
+    private @Nullable Map<String, ReplyDto> syncReplyMapping;
     private @Nullable AsyncCmdProperties asyncCmdProperties;
 
 }

@@ -10,7 +10,7 @@ import javax.annotation.PostConstruct;
 @Slf4j
 @Data
 @Component
-@ConfigurationProperties("botproperties")
+@ConfigurationProperties
 public class BotProperties {
 
     @PostConstruct

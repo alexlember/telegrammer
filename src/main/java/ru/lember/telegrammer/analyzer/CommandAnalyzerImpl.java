@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.StringUtils;
 import ru.lember.telegrammer.configs.CmdProperties;
 import ru.lember.telegrammer.configs.ReplyProperties;
+import ru.lember.telegrammer.configs.reply.ReplyDto;
 
 import javax.annotation.PostConstruct;
 import java.util.Optional;
@@ -32,9 +33,9 @@ public class CommandAnalyzerImpl implements CommandAnalyzer {
             log.info("CommandAnalyzerImpl analyze cmd: {}", cmd);
 
             if (properties.getSyncReplyMapping() != null) {
-                String syncReplyMessage = properties.getSyncReplyMapping().get(cmd);
-                if (!StringUtils.isEmpty(syncReplyMessage)) {
-                    return AnalyzedResult.sync(syncReplyMessage);
+                ReplyDto syncReplyDto = properties.getSyncReplyMapping().get(cmd);
+                if (!StringUtils.isEmpty(syncReplyDto)) {
+                    return AnalyzedResult.sync(syncReplyDto);
                 }
             }
 
@@ -43,13 +44,13 @@ public class CommandAnalyzerImpl implements CommandAnalyzer {
                 if (replyProperties != null) {
                     return AnalyzedResult.async(
                             cmd,
-                            replyProperties.getReplyMessage(),
+                            replyProperties.getReply(),
                             Optional.ofNullable(replyProperties.getTimeoutMs())
                                     .orElse(properties.getAsyncCmdProperties().getGlobalTimeoutMs()),
-                            !StringUtils.isEmpty(replyProperties.getTimeoutErrorMessage())
-                                    ? replyProperties.getTimeoutErrorMessage()
-                                    : properties.getAsyncCmdProperties().getGlobalTimeoutErrorMessage(),
-                            replyProperties.getBeforeActionReplyMessage());
+                            !StringUtils.isEmpty(replyProperties.getTimeoutError())
+                                    ? replyProperties.getTimeoutError()
+                                    : properties.getAsyncCmdProperties().getGlobalTimeoutError(),
+                            replyProperties.getBeforeActionReply());
                 }
 
             }

@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import ru.lember.telegrammer.configs.reply.ReplyDto;
 
 @Getter
 @EqualsAndHashCode
@@ -17,10 +18,10 @@ public class AnalyzedResult {
     private boolean needToIgnore;
 
     private boolean unknown;
-    private @Nullable String unknownReplyMessage;
+    private @Nullable ReplyDto unknownReply;
 
     private boolean needSyncReply;
-    private @Nullable String syncReplyMessage;
+    private @Nullable ReplyDto syncReplyDto;
 
     private @Nullable ImmutableAsyncCmd asyncCmd;
 
@@ -29,18 +30,18 @@ public class AnalyzedResult {
             @Nullable String errorMessage,
             boolean needToIgnore,
             boolean unknown,
-            @Nullable String unknownReplyMessage,
+            @Nullable ReplyDto unknownReply,
             boolean needSyncReply,
-            @Nullable String syncReplyMessage,
+            @Nullable ReplyDto syncReplyDto,
             @Nullable ImmutableAsyncCmd asyncCmd) {
 
         this.isSuccess = isSuccess;
         this.errorMessage = errorMessage;
         this.needToIgnore = needToIgnore;
         this.unknown = unknown;
-        this.unknownReplyMessage = unknownReplyMessage;
+        this.unknownReply = unknownReply;
         this.needSyncReply = needSyncReply;
-        this.syncReplyMessage = syncReplyMessage;
+        this.syncReplyDto = syncReplyDto;
         this.asyncCmd = asyncCmd;
     }
 
@@ -68,7 +69,7 @@ public class AnalyzedResult {
                 null);
     }
 
-    static AnalyzedResult unknown(@NotNull String unknownReplyMessage) {
+    static AnalyzedResult unknown(@NotNull ReplyDto unknownReplyMessage) {
         return new AnalyzedResult(
                 true,
                 null,
@@ -80,7 +81,7 @@ public class AnalyzedResult {
                 null);
     }
 
-    static AnalyzedResult sync(@NotNull String syncReplyMessage) {
+    static AnalyzedResult sync(@NotNull ReplyDto syncReplyDto) {
         return new AnalyzedResult(
                 true,
                 null,
@@ -88,18 +89,18 @@ public class AnalyzedResult {
                 false,
                 null,
                 true,
-                syncReplyMessage,
+                syncReplyDto,
                 null);
     }
 
     static AnalyzedResult async(
             @NotNull String cmd,
-            @NotNull String asyncReplyMessage,
+            @NotNull ReplyDto asyncReply,
             long timeout,
-            @Nullable String timeoutErrorMessage,
-            @Nullable String beforeActionReplyMessage) {
+            @Nullable ReplyDto timeoutError,
+            @Nullable ReplyDto beforeActionReply) {
 
-        ImmutableAsyncCmd asyncCmd = new ImmutableAsyncCmd(cmd, asyncReplyMessage, timeout, timeoutErrorMessage, beforeActionReplyMessage);
+        ImmutableAsyncCmd asyncCmd = new ImmutableAsyncCmd(cmd, asyncReply, timeout, timeoutError, beforeActionReply);
 
         return new AnalyzedResult(
                 true,
