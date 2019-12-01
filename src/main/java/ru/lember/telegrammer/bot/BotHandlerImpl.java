@@ -170,7 +170,12 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
             return;
         }
 
-        AnalyzedResult result = analyzer.analyze(cmd);
+        int spaceIndex = cmd.indexOf(cmdProperties.getCmdNameSeparator());
+
+        final String cmdName = spaceIndex == -1 ? cmd : cmd.substring(0, spaceIndex);
+        final String cmdBody = spaceIndex == -1 ? cmd : cmd.substring(spaceIndex + 1);
+
+        AnalyzedResult result = analyzer.analyze(cmdName);
 
         if (result.isNeedToIgnore()) {
             log.info("Cmd: {} with message id: {} received from: {} is need to be ignored", cmd, messageId, user);
@@ -201,18 +206,18 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
             }
 
             Long id = requestsCounter.incrementAndGet();
-            RequestFromRemote request = new RequestFromRemote(id, cmd, "body", asyncCmd.getTimeoutMs()); // todo fix body
+            RequestFromRemote request = new RequestFromRemote(id, cmdName, cmdBody, asyncCmd.getTimeoutMs());
 
             interconnector.sendRequest(request);
 
             interconnector.processor()
-                    .filter(response -> cmd.equals(response.cmd()) && id.equals(response.correlationId()))
+                    .filter(response -> cmdName.equals(response.cmd()) && id.equals(response.correlationId()))
                     .timeout(Duration.ofMillis(asyncCmd.getTimeoutMs()))
                     .take(1)
                     .subscribe(response -> {
                         log.info("Response on cmd: {} with id: {}. Message: {}. Sending response to messageId: {}", cmd, id, response.message(), messageId);
 
-                        ReplyDto responseMessage = Optional.ofNullable(ReplyDto.ofText(response.message()))
+                        ReplyDto responseMessage = Optional.ofNullable(ReplyDto.ofText(response.message())) // todo support of other replies from RPI node.
                                 .orElse(asyncCmd.getReply());
 
                         tryExecute(ReplyFactory.of(chatId, responseMessage));

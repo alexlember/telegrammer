@@ -27,6 +27,11 @@ public class CmdProperties {
      * По истечении этого таймаута сообщения обрабатываться не будут.
      */
     private int storeCommandsSeconds = 3600; // 1 hour
+
+    /**
+     * Разделитель названия команды от тела.
+     */
+    private String cmdNameSeparator = " ";
     private boolean ignoreUnknownCmd = true;
     private ReplyDto unknownCmdMessageTemplate = ReplyDto.ofText("The command %s is unknown");
     private @Nullable Map<String, ReplyDto> syncReplyMapping;

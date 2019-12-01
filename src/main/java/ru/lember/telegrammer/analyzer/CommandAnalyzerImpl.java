@@ -27,23 +27,23 @@ public class CommandAnalyzerImpl implements CommandAnalyzer {
     }
 
     @Override
-    public AnalyzedResult analyze(String cmd) {
+    public AnalyzedResult analyze(String cmdName) {
         try {
 
-            log.info("CommandAnalyzerImpl analyze cmd: {}", cmd);
+            log.info("CommandAnalyzerImpl analyze cmd: {}", cmdName);
 
             if (properties.getSyncReplyMapping() != null) {
-                ReplyDto syncReplyDto = properties.getSyncReplyMapping().get(cmd);
+                ReplyDto syncReplyDto = properties.getSyncReplyMapping().get(cmdName);
                 if (!StringUtils.isEmpty(syncReplyDto)) {
                     return AnalyzedResult.sync(syncReplyDto);
                 }
             }
 
             if (properties.getAsyncCmdProperties() != null) {
-                ReplyProperties replyProperties = properties.getAsyncCmdProperties().getReplyMapping().get(cmd);
+                ReplyProperties replyProperties = properties.getAsyncCmdProperties().getReplyMapping().get(cmdName);
                 if (replyProperties != null) {
                     return AnalyzedResult.async(
-                            cmd,
+                            cmdName,
                             replyProperties.getReply(),
                             Optional.ofNullable(replyProperties.getTimeoutMs())
                                     .orElse(properties.getAsyncCmdProperties().getGlobalTimeoutMs()),
