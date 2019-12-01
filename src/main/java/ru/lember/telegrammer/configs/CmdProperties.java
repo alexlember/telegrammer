@@ -21,6 +21,12 @@ public class CmdProperties {
         log.info("UserProperties initialized");
     }
 
+    /**
+     * Число секунд для обработки сообщений,
+     * пришедших во время offline бота.
+     * По истечении этого таймаута сообщения обрабатываться не будут.
+     */
+    private int storeCommandsSeconds = 3600; // 1 hour
     private boolean ignoreUnknownCmd = true;
     private ReplyDto unknownCmdMessageTemplate = ReplyDto.ofText("The command %s is unknown");
     private @Nullable Map<String, ReplyDto> syncReplyMapping;

@@ -13,6 +13,7 @@ application:
             - '32234234'
             - '32232112'
     cmdproperties:
+        storeCommandsSeconds: 100
         ignoreUnknownCmd: true
         unknownCmdMessageTemplate:
           type: 'TEXT'

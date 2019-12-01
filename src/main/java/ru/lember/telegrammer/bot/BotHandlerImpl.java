@@ -6,6 +6,7 @@ import org.springframework.util.StringUtils;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
+import org.telegram.telegrambots.meta.api.objects.CallbackQuery;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.User;
@@ -14,12 +15,14 @@ import ru.lember.telegrammer.analyzer.AnalyzedResult;
 import ru.lember.telegrammer.analyzer.CommandAnalyzer;
 import ru.lember.telegrammer.analyzer.ImmutableAsyncCmd;
 import ru.lember.telegrammer.configs.BotProperties;
+import ru.lember.telegrammer.configs.CmdProperties;
 import ru.lember.telegrammer.configs.UserProperties;
 import ru.lember.telegrammer.configs.reply.ReplyDto;
 import ru.lember.telegrammer.dto.in.RequestFromRemote;
 import ru.lember.telegrammer.outbound.Interconnector;
 import javax.annotation.PostConstruct;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeoutException;
@@ -32,6 +35,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
     private UserProperties userProperties;
     private CommandAnalyzer analyzer;
     private Interconnector interconnector;
+    private CmdProperties cmdProperties;
 
     private AtomicLong requestsCounter = new AtomicLong(0);
 
@@ -39,12 +43,14 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
                           BotProperties botProperties,
                           CommandAnalyzer analyzer,
                           Interconnector interconnector,
-                          UserProperties userProperties) {
+                          UserProperties userProperties,
+                          CmdProperties cmdProperties) {
         super(botOptions);
         this.properties = botProperties;
         this.analyzer = analyzer;
         this.interconnector = interconnector;
         this.userProperties = userProperties;
+        this.cmdProperties = cmdProperties;
     }
 
     @PostConstruct
@@ -84,11 +90,42 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
             return;
         }
 
-        Message message = update.getMessage();
-        String cmd = message.getText();
-        Long chatId = message.getChatId();
-        Integer messageId = message.getMessageId();
-        User user = message.getFrom();
+        String cmd;
+        Long chatId;
+        Integer messageId;
+        User user;
+
+        Instant messageInstant;
+
+        if (update.hasMessage()) {
+            Message message = update.getMessage();
+
+            messageInstant = Instant.ofEpochMilli(message.getDate());
+
+            cmd = message.getText();
+            chatId = message.getChatId();
+            messageId = message.getMessageId();
+            user = message.getFrom();
+        } else if (update.hasCallbackQuery()) {
+
+            CallbackQuery callbackQuery = update.getCallbackQuery();
+            cmd = callbackQuery.getData();
+
+            Message message = callbackQuery.getMessage();
+
+            messageInstant = Instant.ofEpochMilli(message.getDate());
+
+            chatId = message.getChatId();
+            messageId = message.getMessageId();
+            user = message.getFrom();
+        } else {
+            log.warn("This type of update is not supported right now. Update: {}", update);
+            return;
+        }
+
+        if (Instant.now().minus(Duration.ofSeconds(cmdProperties.getStoreCommandsSeconds())).isAfter(messageInstant)) {
+            log.warn("Message update {} is out of date. It won't be handled", update);
+        }
 
         handleUpdate(cmd, chatId, messageId, user);
 
