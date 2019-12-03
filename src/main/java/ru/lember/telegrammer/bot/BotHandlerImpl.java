@@ -173,7 +173,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
         int spaceIndex = cmd.indexOf(cmdProperties.getCmdNameSeparator());
 
         final String cmdName = spaceIndex == -1 ? cmd : cmd.substring(0, spaceIndex);
-        final String cmdBody = spaceIndex == -1 ? cmd : cmd.substring(spaceIndex + 1);
+        final String cmdBody = spaceIndex == -1 ? "" : cmd.substring(spaceIndex + 1);
 
         AnalyzedResult result = analyzer.analyze(cmdName);
 
