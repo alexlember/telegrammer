@@ -1,252 +1,241 @@
 server:
-    port: 8088
+  port: 8088
 
 application:
-    userproperties:
-        allowedUsers:
-            - '224823566'
-        replyForUnknownUser:
-          type: 'TEXT'
-          messages:
-           - message: "Мне запрещено разговаривать с незнакомцами"
-        incomingRequestChatIdReceiver:
-            - '32234234'
-            - '32232112'
-    cmdproperties:
-        cmdNameSeparator: " "
-        storeCommandsSeconds: 100
-        ignoreUnknownCmd: true
-        unknownCmdMessageTemplate:
-          type: 'TEXT'
-          messages:
-          - message: "Неизвестная команда!"
-        syncReplyMapping:
-            start:
-              type: 'REPLY_MARKUP'
-              messages:
-                - message: "home"
-              resize: 'true'
-            home:
-              type: 'INLINED_MARKUP'
-              messages:
-              - message: "info"
-                callback: "info_callback"
-              - message: "mode"
-                callback: "mode_callback"
-              - message: "color"
-                callback: "color_callback"
-              - message: "setup"
-                callback: "setup_callback"
-            mode_callback:
-              type: 'INLINED_MARKUP'
-              messages:
-              - message: "with sec"
-                callback: "with_sec_callback"
-              - message: "no sec"
-                callback: "no_sec_callback"
-              - message: "sec on detect"
-                callback: "sec_on_detect_callback"
-            color_callback:
-              type: 'INLINED_MARKUP'
-              messages:
-              - message: "red"
-                callback: "red_callback"
-              - message: "blue"
-                callback: "blue_callback"
-              - message: "green"
-                callback: "green_callback"
-              - message: "grey"
-                callback: "grey_callback"
-        asyncCmdProperties:
-            globalTimeoutMs: 3000
-            globalTimeoutErrorMessage:
+  userproperties:
+    allowedUsers:
+    - '224823566'
+    replyForUnknownUser:
+      type: 'TEXT'
+      text: "Мне запрещено разговаривать с незнакомцами"
+    incomingRequestChatIdReceiver:
+    - '32234234'
+    - '32232112'
+  cmdproperties:
+    cmdNameSeparator: " "
+    storeCommandsSeconds: 100
+    ignoreUnknownCmd: true
+    unknownCmdMessageTemplate:
+      type: 'TEXT'
+      text: "Неизвестная команда!"
+    syncReplyMapping:
+      start:
+        type: 'REPLY_MARKUP'
+        text: "Начало работы. Проверьте клавиатуру"
+        buttons:
+        - text: "home"
+        resize: 'true'
+      home:
+        type: 'INLINED_MARKUP'
+        text: "Выберите команду. [info] - информация о node, [mode] - выбрать режим отображения секунд, [color] - выбрать режим отображения цвета, [setup] - переключить в режим настройки"
+        buttons:
+        - text: "info"
+          callback: "info_callback"
+        - text: "mode"
+          callback: "mode_callback"
+        - text: "color"
+          callback: "color_callback"
+        - text: "setup"
+          callback: "setup_callback"
+      mode_callback:
+        type: 'INLINED_MARKUP'
+        text: "Выберите режим отображения секунд"
+        buttons:
+        - text: "with sec"
+          callback: "with_sec_callback"
+        - text: "no sec"
+          callback: "no_sec_callback"
+        - text: "sec on detect"
+          callback: "sec_on_detect_callback"
+      color_callback:
+        type: 'INLINED_MARKUP'
+        text: "Выберите режим отображения цвета"
+        buttons:
+        - text: "red"
+          callback: "red_callback"
+        - text: "blue"
+          callback: "blue_callback"
+        - text: "green"
+          callback: "green_callback"
+        - text: "grey"
+          callback: "grey_callback"
+    asyncCmdProperties:
+      globalTimeoutMs: 3000
+      globalTimeoutError:
+        type: 'TEXT'
+        text: "Таймаут операции"
+      replyMapping:
+        time:
+          reply:
+            type: 'TEXT'
+            text: "Команда time исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Подтвердите установленное время [ok] или вернитесь к прошлым настройкам [cancel]"
+            buttons:
+            - text: "cancel"
+              callback: "cancel_callback"
+            - text: "ok"
+              callback: "ok_callback"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды time!"
+        setup_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда setup исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Установите время командой [time hh:mm:ss] или вернитесь к прошлым настройкам [cancel]"
+            buttons:
+            - text: "cancel"
+              callback: "cancel_callback"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды setup!"
+        info_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда info исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы запросили информацию о node"
+            buttons:
+            - text: "home"
+              callback: "home"
+            timeoutMs: 5000
+            timeoutError:
               type: 'TEXT'
-              messages:
-              - message: "Таймаут операции"
-            replyMapping:
-                time:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда time исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "cancel"
-                      callback: "cancel_callback"
-                    - message: "ok"
-                      callback: "ok_callback"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды time!"
-                setup_callback:
-                    replyMessage:
-                      type: 'TEXT'
-                      messages:
-                      - message: "Команда setup исполнена на клиенте"
-                    beforeActionReplyMessage:
-                      type: 'INLINED_MARKUP'
-                      messages:
-                      - message: "cancel"
-                        callback: "cancel_callback"
-                    timeoutMs: 5000
-                    timeoutErrorMessage:
-                      type: 'TEXT'
-                      messages:
-                      - message: "Таймаут для команды setup!"
-                info_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда info исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды info!"
-                cancel_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда cancel исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды cancel!"
-                ok_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда ok исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды ok!"
-                with_sec_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда with_sec исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды with_sec!"
-                no_sec_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда no_sec исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды no_sec!"
-                sec_on_detect_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда sec_on_detect исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды sec_on_detect!"
-                red_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда red исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды red!"
-                gray_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда gray исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды gray!"
-                green_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда green исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды green!"
-                blue_callback:
-                  replyMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Команда blue исполнена на клиенте"
-                  beforeActionReplyMessage:
-                    type: 'INLINED_MARKUP'
-                    messages:
-                    - message: "home"
-                      callback: "home"
-                  timeoutMs: 5000
-                  timeoutErrorMessage:
-                    type: 'TEXT'
-                    messages:
-                    - message: "Таймаут для команды blue!"
-    botproperties:
-        connectionTimeoutMs: 3000
-        name: 'AlexeyLemberskiy_bot'
-        token: '977798690:AAHMv3t-kfQhxM16MpEvdCa39e5NAQgsZB4'
+              text: "Таймаут для команды info!"
+        cancel_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда cancel исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду от отмене установленных настроек"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды cancel!"
+        ok_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда ok исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на подтверждение установленных настроек"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды ok!"
+        with_sec_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда with_sec исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на режим отображения с секундами"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды with_sec!"
+        no_sec_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда no_sec исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на режим отображения без секунд"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды no_sec!"
+        sec_on_detect_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда sec_on_detect исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на режим отображения секунд только при обнаружении"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды sec_on_detect!"
+        red_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда red исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на установку красной цветовой гаммы"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды red!"
+        gray_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда gray исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на установку красной серой гаммы"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды gray!"
+        green_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда green исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на установку зеленой цветовой гаммы"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды green!"
+        blue_callback:
+          reply:
+            type: 'TEXT'
+            text: "Команда blue исполнена на клиенте"
+          beforeActionReply:
+            type: 'INLINED_MARKUP'
+            text: "Вы подали команду на установку синей цветовой гаммы"
+            buttons:
+            - text: "home"
+              callback: "home"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды blue!"
+  botproperties:
+    connectionTimeoutMs: 3000
+    name: 'ClockMasterPlekhanov_bot'
+    token: '1008566497:AAGKEvr6Ky-waIYxtn2c_EjQhQwxWvYtQms'

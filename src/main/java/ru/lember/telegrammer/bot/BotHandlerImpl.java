@@ -123,6 +123,8 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
             return;
         }
 
+        log.info("Message instant {}", messageInstant.toEpochMilli());
+
         if (Instant.now().minus(Duration.ofSeconds(cmdProperties.getStoreCommandsSeconds())).isAfter(messageInstant)) {
             log.warn("Message update {} is out of date. It won't be handled", update);
         }

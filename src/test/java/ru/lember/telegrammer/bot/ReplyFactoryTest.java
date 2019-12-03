@@ -8,7 +8,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 import ru.lember.telegrammer.configs.reply.ReplyDto;
-import ru.lember.telegrammer.configs.reply.ReplyPair;
+import ru.lember.telegrammer.configs.reply.ButtonInfo;
 import ru.lember.telegrammer.configs.reply.Type;
 
 import java.util.ArrayList;
@@ -60,11 +60,12 @@ class ReplyFactoryTest {
     void ofTextTest() {
         ReplyDto dto = new ReplyDto();
         dto.setType(Type.TEXT);
+        dto.setText("bla bla");
 
-        List<ReplyPair> messages = new ArrayList<>();
-        ReplyPair pair = new ReplyPair("bla bla", null);
+        List<ButtonInfo> messages = new ArrayList<>();
+        ButtonInfo pair = new ButtonInfo("bla bla from buttons", null);
         messages.add(pair);
-        dto.setMessages(messages);
+        dto.setButtons(messages);
 
         SendMessage expectedSendMessage = new SendMessage();
         expectedSendMessage.setChatId(15L);
@@ -83,17 +84,17 @@ class ReplyFactoryTest {
         ReplyDto dto = new ReplyDto();
         dto.setType(Type.REPLY_MARKUP);
 
-        List<ReplyPair> messages = new ArrayList<>();
+        List<ButtonInfo> messages = new ArrayList<>();
 
-        ReplyPair pair1 = new ReplyPair("bla bla 1", null);
-        ReplyPair pair2 = new ReplyPair("bla bla 2", null);
-        ReplyPair pair3 = new ReplyPair("bla bla 3", null);
+        ButtonInfo pair1 = new ButtonInfo("bla bla 1", null);
+        ButtonInfo pair2 = new ButtonInfo("bla bla 2", null);
+        ButtonInfo pair3 = new ButtonInfo("bla bla 3", null);
 
         messages.add(pair1);
         messages.add(pair2);
         messages.add(pair3);
 
-        dto.setMessages(messages);
+        dto.setButtons(messages);
 
         SendMessage expectedSendMessage = new SendMessage();
         expectedSendMessage.setChatId(15L);
@@ -101,7 +102,8 @@ class ReplyFactoryTest {
 
         Assertions.assertNotNull(actualMessage);
         Assertions.assertNotNull(actualMessage.getReplyMarkup());
-        Assertions.assertNull(actualMessage.getText());
+        Assertions.assertNotNull(actualMessage.getText());
+        Assertions.assertEquals("Reply from bot", actualMessage.getText());
 
         Assertions.assertEquals(expectedSendMessage.getChatId(), actualMessage.getChatId());
         Assertions.assertTrue(actualMessage.getReplyMarkup() instanceof ReplyKeyboardMarkup);
@@ -121,7 +123,7 @@ class ReplyFactoryTest {
 
         /////
 
-        dto.setMessages(messages);
+        dto.setButtons(messages);
         dto.setColumnsLimit(3);
         dto.setOneTime(true);
         dto.setSelective(true);
@@ -131,7 +133,8 @@ class ReplyFactoryTest {
 
         Assertions.assertNotNull(actualMessage);
         Assertions.assertNotNull(actualMessage.getReplyMarkup());
-        Assertions.assertNull(actualMessage.getText());
+        Assertions.assertNotNull(actualMessage.getText());
+        Assertions.assertEquals("Reply from bot", actualMessage.getText());
 
         Assertions.assertTrue(actualMessage.getReplyMarkup() instanceof ReplyKeyboardMarkup);
 
@@ -152,17 +155,17 @@ class ReplyFactoryTest {
         ReplyDto dto = new ReplyDto();
         dto.setType(Type.INLINED_MARKUP);
 
-        List<ReplyPair> messages = new ArrayList<>();
+        List<ButtonInfo> messages = new ArrayList<>();
 
-        ReplyPair pair1 = new ReplyPair("bla bla 1", "callback1");
-        ReplyPair pair2 = new ReplyPair("bla bla 2", "callback2");
-        ReplyPair pair3 = new ReplyPair("bla bla 3", "callback3");
+        ButtonInfo pair1 = new ButtonInfo("bla bla 1", "callback1");
+        ButtonInfo pair2 = new ButtonInfo("bla bla 2", "callback2");
+        ButtonInfo pair3 = new ButtonInfo("bla bla 3", "callback3");
 
         messages.add(pair1);
         messages.add(pair2);
         messages.add(pair3);
 
-        dto.setMessages(messages);
+        dto.setButtons(messages);
 
         SendMessage expectedSendMessage = new SendMessage();
         expectedSendMessage.setChatId(15L);
@@ -170,7 +173,9 @@ class ReplyFactoryTest {
 
         Assertions.assertNotNull(actualMessage);
         Assertions.assertNotNull(actualMessage.getReplyMarkup());
-        Assertions.assertNull(actualMessage.getText());
+        Assertions.assertNotNull(actualMessage.getText());
+        Assertions.assertEquals("Reply from bot", actualMessage.getText());
+
 
         Assertions.assertEquals(expectedSendMessage.getChatId(), actualMessage.getChatId());
         Assertions.assertTrue(actualMessage.getReplyMarkup() instanceof InlineKeyboardMarkup);
@@ -188,14 +193,15 @@ class ReplyFactoryTest {
 
         /////
 
-        dto.setMessages(messages);
+        dto.setButtons(messages);
         dto.setColumnsLimit(3);
 
         actualMessage = ReplyFactory.of(15L, dto);
 
         Assertions.assertNotNull(actualMessage);
         Assertions.assertNotNull(actualMessage.getReplyMarkup());
-        Assertions.assertNull(actualMessage.getText());
+        Assertions.assertNotNull(actualMessage.getText());
+        Assertions.assertEquals("Reply from bot", actualMessage.getText());
 
         Assertions.assertTrue(actualMessage.getReplyMarkup() instanceof InlineKeyboardMarkup);
 

@@ -2,7 +2,6 @@ package ru.lember.telegrammer.configs.reply;
 
 import lombok.Data;
 
-import java.util.Collections;
 import java.util.List;
 
 @Data
@@ -11,9 +10,14 @@ public class ReplyDto {
     private Type type;
 
     /**
-     * For Text only 1 element in the list
+     * For Text type and for ReplyKeyboardMarkup
      */
-    private List<ReplyPair> messages;
+    private String text = "Reply from bot";
+
+    /**
+     * Only for KeyboardMarkups
+     */
+    private List<ButtonInfo> buttons;
 
     /**
      * Only for KeyboardMarkups
@@ -37,8 +41,7 @@ public class ReplyDto {
     public static ReplyDto ofText(String text) {
         ReplyDto dto = new ReplyDto();
         dto.setType(Type.TEXT);
-        ReplyPair pair = new ReplyPair(text, null);
-        dto.setMessages(Collections.singletonList(pair));
+        dto.setText(text);
         return dto;
     }
 

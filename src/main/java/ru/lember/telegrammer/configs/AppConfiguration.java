@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
+import org.telegram.telegrambots.ApiContextInitializer;
 import org.telegram.telegrambots.bots.DefaultBotOptions;
 import org.telegram.telegrambots.meta.ApiContext;
 import org.telegram.telegrambots.meta.generics.LongPollingBot;
@@ -31,6 +32,10 @@ public class AppConfiguration {
     public AppConfiguration(RootProperties properties, SimpMessagingTemplate messagingTemplate) {
         this.properties = properties;
         this.messagingTemplate = messagingTemplate;
+
+        log.info("ApiContextInitializer start init");
+        ApiContextInitializer.init();
+        log.info("ApiContextInitializer finish init");
     }
 
     @PostConstruct
