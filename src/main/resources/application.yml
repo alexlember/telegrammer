@@ -39,6 +39,7 @@ application:
                 callback: "setup_callback"
             mode_callback:
               type: 'INLINED_MARKUP'
+              messages:
               - message: "with sec"
                 callback: "with_sec_callback"
               - message: "no sec"
@@ -47,6 +48,7 @@ application:
                 callback: "sec_on_detect_callback"
             color_callback:
               type: 'INLINED_MARKUP'
+              messages:
               - message: "red"
                 callback: "red_callback"
               - message: "blue"
