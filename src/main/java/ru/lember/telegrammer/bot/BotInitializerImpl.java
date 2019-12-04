@@ -33,7 +33,7 @@ public class BotInitializerImpl implements BotInitializer, ApplicationContextAwa
 
         log.info("Start running bot");
 
-        // todo uncomment to have actually bot working
+        // todo comment/uncomment to have actually bot working/not working
 
         TelegramBotsApi telegramBotsApi = new TelegramBotsApi();
         bots.forEach(bot -> {

@@ -32,6 +32,12 @@ import java.util.concurrent.atomic.AtomicLong;
 @Slf4j
 public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler {
 
+    /**
+     * Special mark which is telling to supply user and chat id to Telegram chat.
+     */
+    private static final String MARK_TELL_WHO_YOU_ARE = "tellWhoYouAre";
+    private static final String WHO_YOU_ARE_TEMPLATE = "I don't know you. Tell administrator to add your data to the system. User id: %s, chat id: %s";
+
     private BotProperties properties;
     private UserProperties userProperties;
     private CommandAnalyzer analyzer;
@@ -40,8 +46,10 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
 
     private AtomicLong requestsCounter = new AtomicLong(0);
 
-    private ExecutorService executor;
+    private ExecutorService commandExecutor;
     private BlockingQueue<Update> commandQueue;
+
+    private final ExecutorService queueWatcher = Executors.newSingleThreadExecutor();
 
     public BotHandlerImpl(DefaultBotOptions botOptions,
                           BotProperties botProperties,
@@ -55,8 +63,8 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
         this.interconnector = interconnector;
         this.userProperties = userProperties;
         this.cmdProperties = cmdProperties;
-        this.executor = Executors.newFixedThreadPool(cmdProperties.getThreadsNumber());
-        this.commandQueue = new ArrayBlockingQueue<>(cmdProperties.getQueueCapacity());
+        this.commandExecutor = Executors.newFixedThreadPool(cmdProperties.getThreadsNumber());
+        this.commandQueue = new LinkedBlockingDeque<>(cmdProperties.getQueueCapacity());
     }
 
     @PostConstruct
@@ -64,21 +72,27 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
         log.info("initialized");
         subscribeOnRequests();
 
-        while (true) {
-            Update update = commandQueue.poll();
+        queueWatcher.submit(() -> {
+            while (true) {
+                Update update;
+                try {
+                    update = commandQueue.take();
+                } catch (InterruptedException e) {
+                    log.error("commandQueue interrupted: ", e);
+                    throw new RuntimeException(e);
+                }
 
-            if (update == null) {
-                log.debug("Null update received");
-                return;
-            } else {
-                executor.submit(() -> handleUpdate(update));
+                log.debug("Submitting new message with update id: {} to commandExecutor", update.getUpdateId());
+                commandExecutor.submit(() -> handleUpdate(update));
+
             }
-
-        }
+        });
     }
 
     @Override
     public void onUpdateReceived(Update update) {
+
+        log.debug("Update with id: {}. Putting to the queue", update.getUpdateId());
 
         try {
             commandQueue.put(update);
@@ -111,46 +125,63 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
                 }, t -> log.error("Error during executing incoming request Error: {}", t.getMessage()));
     }
 
-    private void handleUpdate(@NotNull Update update) {
+    private void handleUpdate(Update update) {
 
+        log.info("Start handling update with id: {}", update.getUpdateId());
 
         String cmd;
         Long chatId;
         Integer messageId;
         User user;
 
-        Instant messageInstant;
+        //Instant messageInstant;
 
         if (update.hasMessage()) {
             Message message = update.getMessage();
+            user = message.getFrom();
 
-            messageInstant = Instant.ofEpochMilli(message.getDate());
+//            messageInstant = Instant.ofEpochMilli(message.getDate() * 1000);
+//
+//            log.info("Message date: {}", message.getDate());
 
             cmd = message.getText();
             chatId = message.getChatId();
             messageId = message.getMessageId();
-            user = message.getFrom();
         } else if (update.hasCallbackQuery()) {
 
             CallbackQuery callbackQuery = update.getCallbackQuery();
             cmd = callbackQuery.getData();
+            user = callbackQuery.getFrom();
 
             Message message = callbackQuery.getMessage();
 
-            messageInstant = Instant.ofEpochMilli(message.getDate());
+//            log.info("Message date: {}", message.getDate());
+//
+//            messageInstant = Instant.ofEpochMilli(message.getDate() * 1000);
 
             chatId = message.getChatId();
             messageId = message.getMessageId();
-            user = message.getFrom();
+
         } else {
             log.warn("This type of update is not supported right now. Update: {}", update);
             return;
         }
 
-        log.info("Message instant {}", messageInstant.toEpochMilli());
+        // todo this funtionality is to prevent from massive messages handling after some shutdown.
+//        Instant now = Instant.now();
+//        log.info("Now instant: {}", now); // todo move to debug
+//        log.info("Message instant: {}", messageInstant); // todo move to debug
+//
+//        Instant nowMinusDelta = now.minus(Duration.ofMillis(cmdProperties.getStoreCommandsSeconds() * 1000));
+//        log.info("Now - delta instant: {}", nowMinusDelta); // todo move to debug
+//
+//        if (nowMinusDelta.isAfter(messageInstant)) {
+//            log.warn("Message update with id: {} is out of date. It won't be handled", update.getUpdateId());
+//            return;
+//        }
 
-        if (Instant.now().minus(Duration.ofSeconds(cmdProperties.getStoreCommandsSeconds())).isAfter(messageInstant)) {
-            log.warn("Message update {} is out of date. It won't be handled", update);
+        if (cmd.startsWith("/")) {
+            cmd = cmd.substring(1); // get rid of '/' at the beginning.
         }
 
         handleUpdate(cmd, chatId, messageId, user);
@@ -175,18 +206,22 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
 
     @Override
     public void handleUpdate(String cmd, Long chatId, Integer messageId, User user) {
-        log.info("Cmd: {} from chat id: {} with message id: {} received from: {}", cmd, chatId, messageId, user);
+        log.info("Cmd: '{}' from chat id: '{}' with message id: {} received from: {}", cmd, chatId, messageId, user);
 
         Integer userId = user.getId();
 
         if (!userProperties.getAllowedUsers().contains(String.valueOf(userId))) {
 
-            log.info("Cmd: {} from chat id: {} received from unknown userId: {} name: {} lastName: {}", userId, user.getFirstName(), user.getLastName());
+            log.info("Cmd: '{}' from chat id: {} received from unknown userId: {} name: {} lastName: {}", userId, user.getFirstName(), user.getLastName());
 
             ReplyDto replyForUnknownUser = userProperties.getReplyForUnknownUser();
             if (replyForUnknownUser != null) {
 
-                log.info("Sending response: {} on cmd: {} from chat id: {} received from unknown",
+                if (MARK_TELL_WHO_YOU_ARE.equals(replyForUnknownUser.getText())) {
+                    replyForUnknownUser.setText(String.format(WHO_YOU_ARE_TEMPLATE, userId, chatId));
+                }
+
+                log.info("Sending response: {} on cmd: '{}' from chat id: {} received from unknown",
                         replyForUnknownUser, cmd, chatId);
 
                 tryExecute(ReplyFactory.of(chatId, replyForUnknownUser));
@@ -203,15 +238,15 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
         AnalyzedResult result = analyzer.analyze(cmdName);
 
         if (result.isNeedToIgnore()) {
-            log.info("Cmd: {} with message id: {} received from: {} is need to be ignored", cmd, messageId, user);
+            log.info("Cmd: '{}' with message id: {} received from: {} is need to be ignored", cmd, messageId, user);
         } else if (result.isUnknown()) {
-            log.info("Cmd: {} with message id: {} received from: {} is unknown", cmd, messageId, user);
+            log.info("Cmd: '{}' with message id: {} received from: {} is unknown", cmd, messageId, user);
 
             if (result.getUnknownReply() != null) {
                 tryExecute(ReplyFactory.of(chatId, result.getUnknownReply()));
             }
         } else if (result.isNeedSyncReply()) {
-            log.info("Cmd: {} with message id: {} received from: {} is need to be replied in sync manner", cmd, messageId, user);
+            log.info("Cmd: '{}' with message id: {} received from: {} is need to be replied in sync manner", cmd, messageId, user);
 
             tryExecute(ReplyFactory.of(chatId, Objects.requireNonNull(result.getSyncReplyDto())));
 
@@ -225,7 +260,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
             }
 
             if (asyncCmd.getBeforeActionReply() != null) {
-                log.error("Sending sync response for async command: {} with id: {}", cmd, messageId);
+                log.error("Sending sync response for async cmd: '{}' with id: {}", cmd, messageId);
 
                 tryExecute(ReplyFactory.of(chatId, asyncCmd.getBeforeActionReply()));
             }
@@ -240,7 +275,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
                     .timeout(Duration.ofMillis(asyncCmd.getTimeoutMs()))
                     .take(1)
                     .subscribe(response -> {
-                        log.info("Response on cmd: {} with id: {}. Message: {}. Sending response to messageId: {}", cmd, id, response.message(), messageId);
+                        log.info("Response on cmd: '{}' with id: {}. Message: {}. Sending response to messageId: {}", cmd, id, response.message(), messageId);
 
                         ReplyDto responseMessage = Optional.ofNullable(ReplyDto.ofText(response.message())) // todo support of other replies from RPI node.
                                 .orElse(asyncCmd.getReply());
@@ -248,7 +283,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
                         tryExecute(ReplyFactory.of(chatId, responseMessage));
 
                     }, t -> {
-                        log.error("Error during executing request cmd: {} with id: {}. Error: {}", cmd, id, t.getMessage());
+                        log.error("Error during executing request cmd: '{}' with id: {}. Error: {}", cmd, id, t.getMessage());
 
                         if (t instanceof TimeoutException) {
 
@@ -256,7 +291,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
                             ReplyDto timeoutReplyMessage = asyncCmd.getTimeoutError();
 
                             if (timeoutReplyMessage != null) {
-                                log.info("Sending response for timeout exception: {} for cmd: {} with messageId: {}", timeoutReplyMessage, cmd, messageId);
+                                log.info("Sending response for timeout exception: {} for cmd: '{}' with messageId: {}", timeoutReplyMessage, cmd, messageId);
 
                                 tryExecute(ReplyFactory.of(chatId, timeoutReplyMessage));
                             }

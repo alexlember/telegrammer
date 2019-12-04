@@ -7,10 +7,9 @@ application:
     - '224823566'
     replyForUnknownUser:
       type: 'TEXT'
-      text: "Мне запрещено разговаривать с незнакомцами"
+      text: "tellWhoYouAre"
     incomingRequestChatIdReceiver:
-    - '32234234'
-    - '32232112'
+    - '224823566'
   cmdproperties:
     threadsNumber: 4
     queueCapacity: 128
@@ -75,10 +74,10 @@ application:
             type: 'INLINED_MARKUP'
             text: "Подтвердите установленное время [ok] или вернитесь к прошлым настройкам [cancel]"
             buttons:
-            - text: "cancel"
-              callback: "cancel_callback"
             - text: "ok"
               callback: "ok_callback"
+            - text: "cancel"
+              callback: "cancel_callback"
           timeoutMs: 5000
           timeoutError:
             type: 'TEXT'
@@ -107,10 +106,10 @@ application:
             buttons:
             - text: "home"
               callback: "home"
-            timeoutMs: 5000
-            timeoutError:
-              type: 'TEXT'
-              text: "Таймаут для команды info!"
+          timeoutMs: 5000
+          timeoutError:
+            type: 'TEXT'
+            text: "Таймаут для команды info!"
         cancel_callback:
           reply:
             type: 'TEXT'

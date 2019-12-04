@@ -18,7 +18,7 @@ public class CmdProperties {
 
     @PostConstruct
     private void postConstruct() {
-        log.info("UserProperties initialized");
+        log.info("initialized");
     }
 
     /**
