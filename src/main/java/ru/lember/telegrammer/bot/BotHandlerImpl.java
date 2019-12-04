@@ -20,12 +20,13 @@ import ru.lember.telegrammer.configs.UserProperties;
 import ru.lember.telegrammer.configs.reply.ReplyDto;
 import ru.lember.telegrammer.dto.in.RequestFromRemote;
 import ru.lember.telegrammer.outbound.Interconnector;
+
 import javax.annotation.PostConstruct;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.TimeoutException;
+import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 @Slf4j
@@ -39,6 +40,9 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
 
     private AtomicLong requestsCounter = new AtomicLong(0);
 
+    private ExecutorService executor;
+    private BlockingQueue<Update> commandQueue;
+
     public BotHandlerImpl(DefaultBotOptions botOptions,
                           BotProperties botProperties,
                           CommandAnalyzer analyzer,
@@ -51,12 +55,37 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
         this.interconnector = interconnector;
         this.userProperties = userProperties;
         this.cmdProperties = cmdProperties;
+        this.executor = Executors.newFixedThreadPool(cmdProperties.getThreadsNumber());
+        this.commandQueue = new ArrayBlockingQueue<>(cmdProperties.getQueueCapacity());
     }
 
     @PostConstruct
     private void postConstruct() {
         log.info("initialized");
         subscribeOnRequests();
+
+        while (true) {
+            Update update = commandQueue.poll();
+
+            if (update == null) {
+                log.debug("Null update received");
+                return;
+            } else {
+                executor.submit(() -> handleUpdate(update));
+            }
+
+        }
+    }
+
+    @Override
+    public void onUpdateReceived(Update update) {
+
+        try {
+            commandQueue.put(update);
+        } catch (InterruptedException e) {
+            log.error("commandQueue put error: {}", e.getMessage());
+        }
+
     }
 
     private void subscribeOnRequests() {
@@ -82,13 +111,8 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
                 }, t -> log.error("Error during executing incoming request Error: {}", t.getMessage()));
     }
 
-    @Override
-    public void onUpdateReceived(Update update) {
+    private void handleUpdate(@NotNull Update update) {
 
-        if (update == null) {
-            log.warn("Null update received");
-            return;
-        }
 
         String cmd;
         Long chatId;
@@ -130,7 +154,6 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
         }
 
         handleUpdate(cmd, chatId, messageId, user);
-
     }
 
     private void tryExecute(@NotNull SendMessage message) {

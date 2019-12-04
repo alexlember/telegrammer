@@ -29,6 +29,16 @@ public class CmdProperties {
     private int storeCommandsSeconds = 3600; // 1 hour
 
     /**
+     * Число потоков для обработки входящих сообщений.
+     */
+    private int threadsNumber = 4;
+
+    /**
+     * Размер очереди для обработки сообщений.
+     */
+    private int queueCapacity = 128;
+
+    /**
      * Разделитель названия команды от тела.
      */
     private String cmdNameSeparator = " ";
