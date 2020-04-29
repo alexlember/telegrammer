@@ -45,7 +45,7 @@ public class AppConfiguration {
 
     @Bean
     BotInitializer botConnector(final List<LongPollingBot> botHandlers) {
-        return new BotInitializerImpl(botHandlers);
+        return new BotInitializerImpl(botHandlers, properties.getBotProperties());
     }
 
     @Bean

@@ -230,10 +230,11 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
             return;
         }
 
-        int spaceIndex = cmd.indexOf(cmdProperties.getCmdNameSeparator());
 
-        final String cmdName = spaceIndex == -1 ? cmd : cmd.substring(0, spaceIndex);
-        final String cmdBody = spaceIndex == -1 ? "" : cmd.substring(spaceIndex + 1);
+        int separatorIndex = cmd.indexOf(cmdProperties.getCmdNameSeparator());
+        final String cmdName = separatorIndex == -1 ? cmd : cmd.substring(0, separatorIndex);
+        final String cmdBody = separatorIndex == -1 ? "" : cmd.substring(separatorIndex + 1);
+
 
         AnalyzedResult result = analyzer.analyze(cmdName);
 
@@ -264,6 +265,7 @@ public class BotHandlerImpl extends TelegramLongPollingBot implements BotHandler
 
                 tryExecute(ReplyFactory.of(chatId, asyncCmd.getBeforeActionReply()));
             }
+
 
             Long id = requestsCounter.incrementAndGet();
             RequestFromRemote request = new RequestFromRemote(id, cmdName, cmdBody, asyncCmd.getTimeoutMs());

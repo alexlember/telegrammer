@@ -31,37 +31,37 @@ application:
         text: "Выберите команду. [info] - информация о node, [mode] - выбрать режим отображения секунд, [color] - выбрать режим отображения цвета, [setup] - переключить в режим настройки"
         buttons:
         - text: "info"
-          callback: "info_callback"
+          callback: "info"
         - text: "mode"
-          callback: "mode_callback"
+          callback: "modeCallback"
         - text: "color"
-          callback: "color_callback"
+          callback: "colorCallback"
         - text: "setup"
-          callback: "setup_callback"
-      mode_callback:
+          callback: "setup"
+      modeCallback:
         type: 'INLINED_MARKUP'
         text: "Выберите режим отображения секунд"
         buttons:
         - text: "with sec"
-          callback: "with_sec_callback"
+          callback: "mode withSeconds"
         - text: "no sec"
-          callback: "no_sec_callback"
+          callback: "mode noSeconds"
         - text: "sec on detect"
-          callback: "sec_on_detect_callback"
-      color_callback:
+          callback: "mode secondsOnDetect"
+      colorCallback:
         type: 'INLINED_MARKUP'
         text: "Выберите режим отображения цвета"
         buttons:
         - text: "red"
-          callback: "red_callback"
+          callback: "color redDragon"
         - text: "blue"
-          callback: "blue_callback"
+          callback: "color blueLagoon"
         - text: "green"
-          callback: "green_callback"
+          callback: "color greenForrest"
         - text: "grey"
-          callback: "grey_callback"
+          callback: "color fadeToGray"
     asyncCmdProperties:
-      globalTimeoutMs: 3000
+      globalTimeoutMs: 20000
       globalTimeoutError:
         type: 'TEXT'
         text: "Таймаут операции"
@@ -75,14 +75,14 @@ application:
             text: "Подтвердите установленное время [ok] или вернитесь к прошлым настройкам [cancel]"
             buttons:
             - text: "ok"
-              callback: "ok_callback"
+              callback: "ok"
             - text: "cancel"
-              callback: "cancel_callback"
-          timeoutMs: 5000
+              callback: "cancel"
+          timeoutMs: 20000
           timeoutError:
             type: 'TEXT'
             text: "Таймаут для команды time!"
-        setup_callback:
+        setup:
           reply:
             type: 'TEXT'
             text: "Команда setup исполнена на клиенте"
@@ -91,12 +91,12 @@ application:
             text: "Установите время командой [time hh:mm:ss] или вернитесь к прошлым настройкам [cancel]"
             buttons:
             - text: "cancel"
-              callback: "cancel_callback"
-          timeoutMs: 5000
+              callback: "cancel"
+          timeoutMs: 20000
           timeoutError:
             type: 'TEXT'
             text: "Таймаут для команды setup!"
-        info_callback:
+        info:
           reply:
             type: 'TEXT'
             text: "Команда info исполнена на клиенте"
@@ -106,11 +106,11 @@ application:
             buttons:
             - text: "home"
               callback: "home"
-          timeoutMs: 5000
+          timeoutMs: 20000
           timeoutError:
             type: 'TEXT'
             text: "Таймаут для команды info!"
-        cancel_callback:
+        cancel:
           reply:
             type: 'TEXT'
             text: "Команда cancel исполнена на клиенте"
@@ -120,11 +120,11 @@ application:
             buttons:
             - text: "home"
               callback: "home"
-          timeoutMs: 5000
+          timeoutMs: 20000
           timeoutError:
             type: 'TEXT'
             text: "Таймаут для команды cancel!"
-        ok_callback:
+        ok:
           reply:
             type: 'TEXT'
             text: "Команда ok исполнена на клиенте"
@@ -134,109 +134,40 @@ application:
             buttons:
             - text: "home"
               callback: "home"
-          timeoutMs: 5000
+          timeoutMs: 20000
           timeoutError:
             type: 'TEXT'
             text: "Таймаут для команды ok!"
-        with_sec_callback:
+        'mode':
           reply:
             type: 'TEXT'
-            text: "Команда with_sec исполнена на клиенте"
+            text: "Команда по изменению режима отображения исполнена на клиенте"
           beforeActionReply:
             type: 'INLINED_MARKUP'
-            text: "Вы подали команду на режим отображения с секундами"
+            text: "Вы подали команду на изменение режима отображения"
             buttons:
             - text: "home"
               callback: "home"
-          timeoutMs: 5000
+          timeoutMs: 20000
           timeoutError:
             type: 'TEXT'
-            text: "Таймаут для команды with_sec!"
-        no_sec_callback:
+            text: "Таймаут для команды изменения режима!"
+        'color':
           reply:
             type: 'TEXT'
-            text: "Команда no_sec исполнена на клиенте"
+            text: "Команда по изменению цвета исполнена на клиенте"
           beforeActionReply:
             type: 'INLINED_MARKUP'
-            text: "Вы подали команду на режим отображения без секунд"
+            text: "Вы подали команду на изменение цвета"
             buttons:
             - text: "home"
               callback: "home"
-          timeoutMs: 5000
+          timeoutMs: 20000
           timeoutError:
             type: 'TEXT'
-            text: "Таймаут для команды no_sec!"
-        sec_on_detect_callback:
-          reply:
-            type: 'TEXT'
-            text: "Команда sec_on_detect исполнена на клиенте"
-          beforeActionReply:
-            type: 'INLINED_MARKUP'
-            text: "Вы подали команду на режим отображения секунд только при обнаружении"
-            buttons:
-            - text: "home"
-              callback: "home"
-          timeoutMs: 5000
-          timeoutError:
-            type: 'TEXT'
-            text: "Таймаут для команды sec_on_detect!"
-        red_callback:
-          reply:
-            type: 'TEXT'
-            text: "Команда red исполнена на клиенте"
-          beforeActionReply:
-            type: 'INLINED_MARKUP'
-            text: "Вы подали команду на установку красной цветовой гаммы"
-            buttons:
-            - text: "home"
-              callback: "home"
-          timeoutMs: 5000
-          timeoutError:
-            type: 'TEXT'
-            text: "Таймаут для команды red!"
-        gray_callback:
-          reply:
-            type: 'TEXT'
-            text: "Команда gray исполнена на клиенте"
-          beforeActionReply:
-            type: 'INLINED_MARKUP'
-            text: "Вы подали команду на установку красной серой гаммы"
-            buttons:
-            - text: "home"
-              callback: "home"
-          timeoutMs: 5000
-          timeoutError:
-            type: 'TEXT'
-            text: "Таймаут для команды gray!"
-        green_callback:
-          reply:
-            type: 'TEXT'
-            text: "Команда green исполнена на клиенте"
-          beforeActionReply:
-            type: 'INLINED_MARKUP'
-            text: "Вы подали команду на установку зеленой цветовой гаммы"
-            buttons:
-            - text: "home"
-              callback: "home"
-          timeoutMs: 5000
-          timeoutError:
-            type: 'TEXT'
-            text: "Таймаут для команды green!"
-        blue_callback:
-          reply:
-            type: 'TEXT'
-            text: "Команда blue исполнена на клиенте"
-          beforeActionReply:
-            type: 'INLINED_MARKUP'
-            text: "Вы подали команду на установку синей цветовой гаммы"
-            buttons:
-            - text: "home"
-              callback: "home"
-          timeoutMs: 5000
-          timeoutError:
-            type: 'TEXT'
-            text: "Таймаут для команды blue!"
+            text: "Таймаут для команды изменения цвета!"
   botproperties:
+    inTestMode: false
     connectionTimeoutMs: 3000
     name: 'ClockMasterPlekhanov_bot'
     token: '1008566497:AAGKEvr6Ky-waIYxtn2c_EjQhQwxWvYtQms'
